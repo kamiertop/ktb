@@ -28,3 +28,6 @@ target/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Use published dependencies; do not commit vendored source copies.
+/vendor/
