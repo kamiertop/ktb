@@ -1,0 +1,32 @@
+[package]
+name = "ktb"
+version = "0.1.0"
+edition = "2024"
+description = "Kamiertop desktop toolbox built with Rust and GPUI"
+
+[dependencies]
+gpui-kit = { version = "0.8.0", features = ["tree-sitter"] }
+ely = { package = "ely-core", git = "https://github.com/ELY-Open-Source/Ely-GPUI-Components", default-features = false }
+base64 = "0.23.1"
+chrono = "0.4"
+md5 = "0.8.1"
+sha2 = "0.11.1"
+serde = "1"
+serde_json = "1"
+urlencoding = "2"
+zhconv = "0.4.2"
+qrcode = { version = "0.14", default-features = false }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+rqrr = "0.11"
+
+[dev-dependencies]
+gpui = { package = "gpui-pre", version = "=0.3.9", features = ["test-support"] }
+ttf-parser = "0.25"
+
+[profile.release]
+strip = "symbols"
+lto = "thin"
+
+[patch.crates-io]
+# gpui-base 0.8.0 hardcodes hover-only fold icons; keep JSON folding discoverable.
+gpui-base = { path = "vendor/gpui-base" }

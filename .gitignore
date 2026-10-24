@@ -1,0 +1,30 @@
+# Rust build artifacts (including builds inside vendored crates)
+target/
+**/*.rs.bk
+*.profraw
+*.profdata
+
+# IDE settings and editor temporary files
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# Local agent settings and credentials
+/.codex/
+/.agents/
+/.aws/
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Runtime logs and interrupted media conversion work directories
+*.log
+.ktb-*/
+
+# Desktop metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
