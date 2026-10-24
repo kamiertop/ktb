@@ -46,7 +46,7 @@ impl Tool {
             Self::Md5 => "生成文本的 32 位十六进制摘要（不适合密码存储）",
             Self::Sha256 => "生成文本的 SHA-256 摘要",
             Self::Json => "语法高亮、代码折叠、缩进与格式化",
-            Self::Url => "UTF-8 URL 百分号编码与解码",
+            Self::Url => "整个 URL、参数值与表单的 UTF-8 编解码",
             Self::Video => "批量提取音频、添加或替换视频封面",
             Self::Audio => "MP3 / M4A / FLAC · 编辑标签和封面",
             Self::Qrcode => "生成二维码、保存 PNG、识别图片内容",

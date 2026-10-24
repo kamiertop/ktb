@@ -34,14 +34,15 @@ pub const CONTENT_GAP: f32 = 12.0;
 pub const NAV_WIDTH: f32 = 216.0;
 pub const NAV_SELECTED: u32 = 0xdbeafe;
 pub const NAV_SELECTED_TEXT: u32 = 0x1e40af;
+pub const SEGMENTED_BACKGROUND: u32 = 0xdbeafe;
 
 // Editor surface height, excluding compact labels and controls.
 pub const TEXT_EDITOR_HEIGHT: f32 = 320.0;
 
-// JSON uses a dark code surface within the light application shell.
+// JSON shares the light application palette.
 pub const JSON_EDITOR_SIZE: f32 = 15.0;
-pub const JSON_EDITOR_BACKGROUND: u32 = 0x1e1e1e;
-pub const JSON_EDITOR_FOREGROUND: u32 = 0xd4d4d4;
+pub const JSON_EDITOR_BACKGROUND: u32 = SURFACE;
+pub const JSON_EDITOR_FOREGROUND: u32 = INK;
 
 // Controls switch immediately; avoid decorative sliding transitions.
 pub const REDUCE_MOTION: bool = true;

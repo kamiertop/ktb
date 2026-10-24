@@ -9,7 +9,7 @@
 - 简繁转换：使用 zhconv 词组字典，简体与台湾繁体互转。
 - MD5 / SHA-256：小写与大写十六进制摘要。
 - JSON：代码编辑器、语法高亮、行号、对象/数组折叠、缩进引导线；支持 2 空格 / 4 空格 / Tab，格式化、压缩与带行列位置的错误提示。
-- URL：百分号编码与 UTF-8 解码。
+- URL：完整 URL、参数值、表单三种编码模式，支持严格的 UTF-8 百分号编解码。
 - 清空、当前时间戳和复制结果。
 
 ## 启动
@@ -120,7 +120,7 @@ src/
 
 UI 使用 `gpui-kit = { version = "0.8.0", features = ["tree-sitter"] }` 和 Ely 的 `ely-core` 核心组件，通过 `gpui_kit::*` 使用 GPUI，通过 `gpui_kit::component` 使用组件，运行时无需另外声明 GPUI、Base、Component 或平台依赖。Ely 关闭默认字体特性，继续使用应用现有字体。窗口使用 `gpui_kit::application` 与 `gpui_kit::init`；创建窗口时显式包裹 `gpui_kit::base::Root` 并设置透明背景，避免主题的直角底色从内容圆角外露出。Base Root 继续承载焦点、文本选择与浮层。
 
-通过 Base 公开的 `RootPlugin` 装饰接口，在组件初始化前保存完整根表面、初始化后直接呈现该表面，替换 Kit 默认的直角外框与阴影。页面、主题和全部弹层继续由原有 Root 管理，圆角外不再绘制矩形描边。实现位于 `src/app/window_frame.rs`；实际圆角与缩放由 Ely 自带的 `ResizeBorder::new().glass()` 处理，不再维护手写缩放热区。Ely 的边框色设为透明，圆角比例与应用 16px 配置对齐。窗口外框没有自定义库补丁；JSON 折叠箭头的常驻显示使用下述 Base 补丁。
+通过 Base 公开的 `RootPlugin` 装饰接口，在组件初始化前保存完整根表面、初始化后直接呈现该表面，替换 Kit 默认的直角外框与阴影。页面、主题和全部弹层继续由原有 Root 管理，圆角外不再绘制矩形描边。实现位于 `src/app/window_frame.rs`；实际圆角与缩放由 Ely 自带的 `ResizeBorder::new().glass()` 处理，不再维护手写缩放热区。Ely 的边框色设为透明，圆角比例与应用 16px 配置对齐。项目不维护 vendor 目录或 Cargo 依赖补丁。
 
 日期时间选择使用 Kit 的 DatePicker，启用 `TimePrecision::Second`，不再维护额外的日期时间组合控件。图标统一使用 Kit 自带的 `IconName` 与 `AllAssets`，不再维护独立的 SVG 副本。
 
@@ -128,7 +128,7 @@ UI 使用 `gpui-kit = { version = "0.8.0", features = ["tree-sitter"] }` 和 Ely
 
 ## JSON 编辑器
 
-JSON 页使用 GPUI Kit 的 `input::{Editor, EditorState}`，启用 JSON 的 tree-sitter 高亮。左右编辑器支持行号、代码折叠和缩进引导线，输入区支持 Tab / Shift+Tab，结果区只读但可以选择、折叠和复制。编辑区保留深色背景，使用 Kit 深色语法高亮、15px 常规字重及公共代码字体，应用其余区域维持浅色。
+JSON 页使用 GPUI Kit 的 `input::{Editor, EditorState}`，启用 JSON 的 tree-sitter 高亮。左右编辑器支持行号、代码折叠和缩进引导线，输入区支持 Tab / Shift+Tab，结果区只读但可以选择、折叠和复制。编辑区使用浅色背景和 Kit 浅色语法高亮，保留 15px 常规字重及内置等宽代码字体；折叠箭头沿用组件原生的悬停、当前行或已折叠时显示行为。
 
 默认每层 4 空格，可切换 2 空格或真实 Tab；切换时同步更新编辑器设置与已有格式化结果，压缩结果保持单行。提供格式化、压缩、清空、复制和带行列位置的错误提示。
 
@@ -136,4 +136,11 @@ JSON 页使用 GPUI Kit 的 `input::{Editor, EditorState}`，启用 JSON 的 tre
 
 JSON 等代码编辑区内置 Liberation Mono Regular 静态等宽字体，并显式设为 Kit 的代码字体，避免系统缺少指定字体时回退为比例字体、导致四个空格的视觉宽度过窄。空格与 ASCII 代码字符等宽；中文仍由字体回退显示。字体许可证见 `assets/fonts/LiberationMono-LICENSE`。
 
-JSON 折叠/展开箭头常驻显示，不需要将鼠标移到行号区域。当前 gpui-base 0.8.0 没有公开的显示策略选项，因此通过 `[patch.crates-io]` 使用 `vendor/gpui-base`，只移除折叠箭头绘制时的悬停限制；保留 Apache-2.0 许可证。补丁说明见 `vendor/gpui-base/KTB-PATCH.md`。
+
+简繁转换页的输入和结果编辑区等高，并通过弹性布局使用窗口剩余高度；全屏或调高窗口时一起向下扩展，底部转换、清空和复制按钮保留可用空间。
+
+## URL 工具
+
+输入区与结果区共用三种编码模式，默认选择「整个 URL」：整个 URL 保留 URL 分隔符，参数值模式使用 UTF-8 百分号编码，表单模式将空格写为 `+`、原有加号写为 `%2B`。严格检查 `%XX` 和 UTF-8 编码，不自动转换粘贴内容。
+
+页面仅保留输入、结果、编码、解码、清空和复制，不包含链接结构、查询参数或锚点编辑、中文可读展示及批量处理。

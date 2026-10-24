@@ -46,23 +46,29 @@ impl Page {
         div()
             .flex()
             .flex_col()
+            .flex_1()
+            .min_h_0()
             .gap_4()
             .child(
                 div()
                     .flex()
+                    .flex_1()
+                    .min_h_0()
                     .gap_4()
-                    .items_start()
+                    .items_stretch()
                     .child(
                         div()
                             .flex()
                             .flex_col()
                             .flex_1()
                             .min_w_0()
+                            .min_h_0()
                             .gap_2()
                             .child(eyebrow("输入"))
                             .child(
                                 Textarea::new(&self.input)
-                                    .h(px(theme::TEXT_EDITOR_HEIGHT))
+                                    .flex_1()
+                                    .min_h_0()
                                     .text_size(px(theme::EDITOR_SIZE))
                                     .font_weight(theme::FONT_WEIGHT),
                             )
@@ -82,11 +88,13 @@ impl Page {
                             .flex_col()
                             .flex_1()
                             .min_w_0()
+                            .min_h_0()
                             .gap_2()
                             .child(eyebrow("结果"))
                             .child(
                                 Textarea::new(&self.output)
-                                    .h(px(theme::TEXT_EDITOR_HEIGHT))
+                                    .flex_1()
+                                    .min_h_0()
                                     .text_size(px(theme::EDITOR_SIZE))
                                     .font_weight(theme::FONT_WEIGHT)
                                     .readonly(true),
@@ -106,6 +114,7 @@ impl Page {
             .child(
                 div()
                     .flex()
+                    .flex_shrink_0()
                     .gap_3()
                     .child(
                         Button::new("convert", primary)
@@ -124,11 +133,14 @@ impl Render for Page {
         div()
             .flex()
             .flex_col()
+            .flex_1()
+            .min_h_0()
             .gap_4()
             .child(self.workspace(cx))
             .children((!self.status.is_empty()).then(|| {
                 div()
                     .px_4()
+                    .flex_shrink_0()
                     .py_3()
                     .rounded_lg()
                     .bg(rgb(if self.failed {
@@ -144,5 +156,54 @@ impl Render for Page {
                     }))
                     .child(self.status.clone())
             }))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Page;
+    use gpui_kit::{
+        AppContext, Context, Entity, IntoElement, ParentElement, Render, Styled, TestAppContext,
+        Window, div, px, size,
+    };
+
+    struct Preview(Entity<Page>);
+    impl Render for Preview {
+        fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
+            div()
+                .size_full()
+                .flex()
+                .flex_col()
+                .child(div().h(px(120.)).flex_shrink_0())
+                .child(self.0.clone())
+        }
+    }
+
+    #[gpui_kit::test]
+    fn both_textareas_grow_together_when_window_height_increases(cx: &mut TestAppContext) {
+        cx.update(gpui_kit::init);
+        let (view, cx) =
+            cx.add_window_view(|window, cx| Preview(cx.new(|cx| Page::new(window, cx))));
+        let page = view.read_with(cx, |view, _| view.0.clone());
+        let mut heights = Vec::new();
+        for height in [800., 1200.] {
+            cx.simulate_resize(size(px(1200.), px(height)));
+            cx.update(|window, cx| {
+                window.draw(cx).clear(cx);
+            });
+            let bounds = page.read_with(cx, |page, cx| {
+                (
+                    page.input.read(cx).input_bounds(),
+                    page.output.read(cx).input_bounds(),
+                )
+            });
+            assert!((bounds.0.size.height - bounds.1.size.height).abs() < px(1.));
+            assert!(bounds.0.bottom() < px(height));
+            heights.push(bounds.0.size.height);
+        }
+        assert!(
+            (heights[1] - heights[0] - px(400.)).abs() < px(1.),
+            "textareas must use the extra window height: {heights:?}"
+        );
     }
 }

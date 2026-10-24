@@ -14,7 +14,8 @@ pub fn init(cx: &mut App) {
     theme.sidebar_accent = rgb(NAV_SELECTED).into();
     theme.sidebar_accent_foreground = rgb(NAV_SELECTED_TEXT).into();
     theme.tokens.sidebar_accent = Hsla::from(rgb(NAV_SELECTED)).into();
-    theme.highlight_theme = gpui_kit::component::highlighter::HighlightTheme::default_dark();
+    theme.tokens.tab_bar_segmented = Hsla::from(rgb(SEGMENTED_BACKGROUND)).into();
+    theme.highlight_theme = gpui_kit::component::highlighter::HighlightTheme::default_light();
     theme.caret = rgb(0x569cd6).into();
     theme.font_size = px(BODY_SIZE);
     theme.font_family = FONT_FAMILY.into();
@@ -22,9 +23,6 @@ pub fn init(cx: &mut App) {
     theme.foreground = rgb(INK).into();
     theme.primary_foreground = rgb(ON_ACCENT).into();
     theme.muted_foreground = rgb(MUTED).into();
-    // Kit's folding chevrons are ghost buttons and use secondary_foreground,
-    // independently of the editor's text color. Keep icons legible on both surfaces.
-    theme.secondary_foreground = rgb(0x858585).into();
 }
 
 /// Keep Ely's frame and focus surfaces aligned with the existing Kit theme.

@@ -40,6 +40,7 @@ impl Render for Toolbox {
                             .flex_col()
                             .flex_1()
                             .min_w_0()
+                            .min_h_0()
                             .h_full()
                             .overflow_y_scroll()
                             .pt(px(theme::CONTENT_TOP))
@@ -50,6 +51,7 @@ impl Render for Toolbox {
                                 div()
                                     .flex()
                                     .flex_col()
+                                    .flex_shrink_0()
                                     .gap_2()
                                     .child(
                                         div()
